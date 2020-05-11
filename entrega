@@ -1,0 +1,94 @@
+import hangman
+import reversegam
+import tictactoeModificado
+import PySimpleGUI as sg
+import json
+import os
+import time
+
+
+def ingresar_datos():
+	cruz=True
+	columna=[
+			[sg.Listbox(values=['1- Ahorcado','2- Ta - Te - Ti','3- Otello','4- Salir'], size=(30, 6))],
+			[sg.Button('Enviar')]
+			]
+	columna1 = [
+	    [sg.Text('Ingrese su nombre')],[sg.Input(key='nombre')],
+	    [sg.Text('Ingrese su Apellido')],[sg.Input(key='apellido')],
+		[sg.Text(time.strftime("%H:%M:%S")),sg.Text(time.strftime("%d/%m/%y"))]
+	]
+	layout = [
+	    [
+	     sg.Column(columna1,background_color='green'), sg.Column(columna, background_color='green')
+	     ]
+	]
+
+	window = sg.Window("Ventana").Layout(layout)
+	events,values = window.read()
+	if(events== None):
+		cruz=False
+	window.close()
+	return values[0],values['nombre'],values['apellido'],cruz
+
+def sigue_jugando():
+	cruz=False
+	columna=[
+			[sg.Listbox(values=['1- Ahorcado','2- Ta - Te - Ti','3- Otello','4- Salir'], size=(30, 6))],
+			[sg.Button('Enviar')]
+			]
+
+	layout = [
+	    [
+		sg.Frame('SEGUIS JUGANDO',[[
+	     sg.Column(columna, background_color='lightblue')]])
+	     ]
+	]
+
+	window = sg.Window("Ventana").Layout(layout)
+	events,values = window.read()
+	if events==None:
+		cruz=True
+	window.close()
+	return values[0],cruz
+
+def where_json(file_name):
+	return os.path.exists(file_name)
+
+info={}
+informacion_usuario=[]
+tupla = ingresar_datos()
+sigo_jugando=tupla[3]
+cruz=tupla[3]
+if(sigo_jugando):
+	keyy=tupla[2]+' '+tupla[1]
+	if where_json('jugadores.json'):
+		archivo=open('jugadores.json','r')
+		info=json.load(archivo)
+	else:
+	    info[keyy] =[]
+	    with open('data.json', 'w') as outfile:
+	        json.dump(info, outfile)
+	if keyy in info:
+		informacion_usuario=info[keyy]
+	else:
+		info[keyy]=[]
+while sigo_jugando:
+	if tupla[0] == ['1- Ahorcado']:
+		hangman.main()
+		informacion_usuario.append('Jugo al ahorcado')
+	elif tupla[0] == ['2- Ta - Te - Ti']:
+		tictactoeModificado.main()
+		informacion_usuario.append('Jugo al TaTeTi')
+	elif tupla[0] == ['3- Otello']:
+		reversegam.main()
+		informacion_usuario.append('Jugo al Reversegam')
+	elif tupla[0]  == ['4- Salir'] or tupla[1]==True :
+		break
+	if tupla[0] != ['4- Salir'] :
+		tupla = sigue_jugando()
+if(cruz):
+	info[keyy]=informacion_usuario
+	archivo= open('jugadores.json', 'w')
+	json.dump(info, archivo, indent=4)
+	archivo.close()
