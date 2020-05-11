@@ -92,3 +92,6 @@ if(cruz):
 	archivo= open('jugadores.json', 'w')
 	json.dump(info, archivo, indent=4)
 	archivo.close()
+
+# utilize diccionario porq me parecio sencillo poder ingresar y preguntar por nombre y apellido y guardar los datos dentro de los mismos
+# utilize json porq me parecio sencillo de utilizar y porq es un archivo de texto
